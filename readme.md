@@ -30,6 +30,26 @@ Current functionality allows administrators to attach a specific time delay (e.g
     2.  Checks the `auto_delay` value for the specific transition ID.
     3.  If a delay exists, it halts the process (Synchronous Wait in MVP).
     4.  Resumes and commits the state change only after the timer expires.
+##📂 Code Roadmap: Modified Files
+Since this repository contains a full Joomla installation, use this list to locate the specific MVP logic:
+
+1. The Event Interceptor (The Brain)
+
+File: plugins/system/workflow_notification/workflow_notification.php (Check your specific folder name, it might be plg_workflow_notification)
+
+Purpose: Contains the onWorkflowBeforeTransition method that intercepts the state change, checks the database for the delay, and executes the sleep() logic.
+
+2. The UI Override (The Interface)
+
+File: administrator/components/com_workflow/tmpl/transition/edit.php
+
+Purpose: The modified layout file where the <input name="auto_delay"> field was injected into the Transition Edit form.
+
+3. Database Schema (The Storage)
+
+File: installation/sql/mysql/joomla.sql (or verify via phpMyAdmin)
+
+Purpose: Extended #__workflow_transitions with the auto_delay (INT) column.
 
 ## 🧪 How to Test the Prototype
 
