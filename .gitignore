@@ -1,0 +1,16 @@
+# Joomla Configuration (CONTAINS PASSWORDS - DO NOT REMOVE THIS LINE)
+configuration.php
+htaccess.txt
+web.config.txt
+
+# Caches and Logs
+/administrator/cache/*
+/administrator/logs/*
+/cache/*
+/tmp/*
+/logs/*
+
+# Images and Media (Optional, keeps repo light)
+/images/*
+/media/*
+!/media/index.html

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="4.0" type="plugin" group="workflow" method="upgrade">
+    <name>Workflow - Automation</name>
+    <author>Yash Verma</author>
+    <creationDate>February 2026</creationDate>
+    <version>1.0</version>
+    <description>Handles automated delays for GSoC project.</description>
+    <files>
+        <filename plugin="automation">automation.php</filename>
+    </files>
+</extension>
