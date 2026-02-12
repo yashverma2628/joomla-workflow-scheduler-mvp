@@ -1,76 +1,59 @@
-Joomla! CMS™
+# Joomla! GSoC '26 Prototype: Automated Workflow Scheduler
 
-1- Overview
-	* This is a Joomla! 5.x installation/upgrade package.
-	* Joomla! Official site: https://www.joomla.org
-	* Joomla! 5.4 version history - https://docs.joomla.org/Special:MyLanguage/Joomla_5.4_version_history
-	* Detailed changes in the Changelog: https://github.com/joomla/joomla-cms/commits/5.4-dev
+**Project:** Automated Workflow Scheduler
+**Organization:** Joomla! (Google Summer of Code 2026)
+**Author:** Yash Verma
 
-2- What is Joomla?
-	* Joomla! is a Content Management System (CMS) which enables you to build websites and powerful online applications.
-	* It's a free and Open Source software, distributed under the GNU General Public License version 2 or later.
-	* This is a simple and powerful web server application and it requires a server with PHP and either MySQL, MariaDB or PostgreSQL to run.
-	You can find full technical requirements here: https://downloads.joomla.org/technical-requirements.
+## 🚀 Overview
+This repository contains a **Proof of Concept (MVP)** for the "Automated Workflow Scheduler" project. It demonstrates a modified Joomla 5.x architecture that introduces **Time-Aware Transitions** to the core Workflow component.
 
-3- Is Joomla! for you?
-	* Joomla! is the right solution for most content web projects: https://docs.joomla.org/Special:MyLanguage/Portal:Learn_More
-	* See Joomla's core features - https://www.joomla.org/core-features.html
-	* Try out our free hosting service: https://launch.joomla.org
+Current functionality allows administrators to attach a specific time delay (e.g., 20 seconds) to a workflow transition. The system intercepts the state change, halts execution for the defined duration, and strictly enforces the delay before committing the new state to the database.
 
-4- How to find a Joomla! translation?
-	* Repository of accredited language packs: https://downloads.joomla.org/language-packs
-	* You can also add languages directly to your website via your Joomla! administration panel: https://docs.joomla.org/Special:MyLanguage/J5.x:Setup_a_Multilingual_Site/Installing_New_Language
-	* Learn how to setup a Multilingual Joomla! Site: https://docs.joomla.org/Special:MyLanguage/J5.x:Setup_a_Multilingual_Site
+> **Note:** This is a prototype developed to validate the database schema and event interception logic. The final GSoC project will replace the synchronous wait mechanisms with the asynchronous `com_scheduler`.
 
-5- Learn Joomla!
-	* Read Getting Started with Joomla to find out the basics: https://docs.joomla.org/Special:MyLanguage/J5.x:Getting_Started_with_Joomla!
-	* Before installing, read the beginners guide: https://docs.joomla.org/Special:MyLanguage/Portal:Beginners
+## 🛠️ Key Technical Features
 
-6- What are the benefits of Joomla?
-	* The functionality of a Joomla! website can be extended by installing extensions that you can create (or download) to suit your needs.
-	* There are many ready-made extensions that you can download and install.
-	* Check out the Joomla! Extensions Directory (JED): https://extensions.joomla.org
+### 1. Database Schema Extension
+* **Modification:** Extended the core `#__workflow_transitions` table.
+* **New Column:** `auto_delay` (Integer) – Stores the delay duration in seconds.
+* **Result:** Persistent storage of scheduling metadata for every workflow transition.
 
-7- Is it easy to change the layout display?
-	* The layout is controlled by templates that you can edit.
-	* There are a lot of ready-made professional templates that you can download.
-	* Check out the template management information: https://docs.joomla.org/Special:MyLanguage/Portal:Template_Management
+### 2. Native UI Integration
+* **Location:** `Administrator > Content > Workflows > Transitions > Edit`
+* **Implementation:** Layout override of the Transition Edit view.
+* **Feature:** A native "Automation Delay (Seconds)" input field that seamlessly integrates into the existing Joomla UX.
 
-8- Ready to install Joomla?
-	* Check the minimum requirements here: https://downloads.joomla.org/technical-requirements
-	* How do you install Joomla - https://docs.joomla.org/Special:MyLanguage/J5.x:Installing_Joomla
-	* You could start your Joomla! experience building your site on a local test server.
-	When ready it can be moved to an online hosting account of your choice.
-	See the tutorial: https://docs.joomla.org/Special:MyLanguage/Installing_Joomla_locally
+### 3. Event Interception Logic
+* **Hook:** `onWorkflowBeforeTransition`
+* **Logic:**
+    1.  Intercepts the transition request before the database update.
+    2.  Checks the `auto_delay` value for the specific transition ID.
+    3.  If a delay exists, it halts the process (Synchronous Wait in MVP).
+    4.  Resumes and commits the state change only after the timer expires.
 
-9- Updates are free!
-	* Always use the latest version: https://downloads.joomla.org/latest
+## 🧪 How to Test the Prototype
 
-10- Where can you get support and help?
-	* The Joomla! Documentation: https://docs.joomla.org/Special:MyLanguage/Main_Page
-	* FAQ Frequently Asked Questions: https://docs.joomla.org/Special:MyLanguage/Category:FAQ
-	* Find the information you need: https://docs.joomla.org/Special:MyLanguage/Start_here
-	* Find help and other users: https://www.joomla.org/about-joomla/create-and-share.html
-	* Post questions at our forums: https://forum.joomla.org
-	* Joomla! Resources Directory (JRD): https://community.joomla.org/service-providers-directory/
+1.  **Install:** Set up this repository as a standard Joomla site on your local server (XAMPP/WAMP).
+2.  **Configure:**
+    * Go to **Content > Workflows** and select a Workflow.
+    * Click on a **Transition** (e.g., "Publish").
+    * Enter `20` in the **Automation Delay** field and Save.
+3.  **Execute:**
+    * Go to **Content > Articles**.
+    * Change an article's status using the transition you modified.
+    * **Observe:** The browser will wait for 20 seconds, and a blue notification bar will confirm: *"Automated delay of 20 seconds completed."*
 
-11- Do you already have a Joomla! site that's not built with Joomla! 5.x ?
-	* What's new in Joomla! 5.x: https://www.joomla.org/5
-	* What are the main differences between 4.x and 5.x? https://docs.joomla.org/Special:MyLanguage/What_are_the_major_differences_between_Joomla!_4.x_and_5.x
-	* How to migrate from 4.x to 5.x? Tutorial: https://docs.joomla.org/Special:MyLanguage/Joomla_4.x_to_5.x_Step_by_Step_Migration
-	* How to migrate from 3.x to 4.x? Tutorial: https://docs.joomla.org/Special:MyLanguage/Joomla_3.x_to_4.x_Step_by_Step_Migration
-	* How to migrate from 2.5.x to 3.x? Tutorial: https://docs.joomla.org/Special:MyLanguage/Joomla_2.5_to_3.x_Step_by_Step_Migration
-	* How to migrate from 1.5.x to 3.x? Tutorial: https://docs.joomla.org/Special:MyLanguage/Joomla_1.5_to_3.x_Step_by_Step_Migration
+## 📂 Repository Structure
+This repository includes the full Joomla CMS source code to demonstrate the core integration. Key modified files include:
+* `administrator/components/com_workflow/tmpl/transition/edit.php` (UI Override)
+* `plugins/system/workflow_scheduler/` (Custom Event Interceptor)
+* `installation/sql/mysql/joomla.sql` (Schema adjustments)
 
-12- Do you want to improve Joomla?
-	* Where to request a feature? https://issues.joomla.org
-	* How do you report a bug? https://docs.joomla.org/Special:MyLanguage/Filing_bugs_and_issues
-	* How to submit code to the Joomla CMS using a Pull Request? https://manual.joomla.org/docs/get-started/git/
-	* Get Involved: Joomla! is a community developed software. Join the community at https://volunteers.joomla.org
-	* Documentation for Developers: https://manual.joomla.org/
-	* Documentation for Web designers: https://docs.joomla.org/Special:MyLanguage/Web_designers
+## 🔮 Future Roadmap (GSoC Implementation)
+The primary goal of the GSoC coding phase is to evolve this synchronous prototype into a fully asynchronous system:
+* **Replace `sleep()`:** Integrate `com_scheduler` to handle delays in the background.
+* **Task Queue:** Implement a "Pending Transitions" queue in the dashboard.
+* **Complex Triggers:** Support absolute dates (e.g., "Jan 1st") and relative offsets (e.g., "+1 Year").
 
-Copyright:
-	* (C) 2005 Open Source Matters, Inc. <https://www.joomla.org>
-	* Distributed under the GNU General Public License version 2 or later
-	* See License details at https://docs.joomla.org/Special:MyLanguage/Joomla_Licenses
+---
+*This prototype is submitted as part of the GSoC 2026 proposal process.*
